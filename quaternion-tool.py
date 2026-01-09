@@ -142,6 +142,7 @@ class QuatViewer(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Quaternion Chaining Viewer (w x y z) ")
+        
 
         # State
         self.q_current = np.array([1.0, 0.0, 0.0, 0.0], dtype=float)  # wxyz
@@ -232,10 +233,7 @@ class QuatViewer(QtWidgets.QMainWindow):
         grid.setSize(10, 10)
         grid.setSpacing(1, 1)
         self.view.addItem(grid)
-
-        axis = gl.GLAxisItem()
-        axis.setSize(2, 2, 2)
-        self.view.addItem(axis)
+        self.add_thick_axes(length=3.0, width=4)
 
         # Load mesh data once and reuse for main + ghosts
         self.meshdata = self.load_meshdata("penguin.obj")
@@ -253,6 +251,39 @@ class QuatViewer(QtWidgets.QMainWindow):
         # Apply identity
         self.apply_quaternion_to_item(self.main_item, self.q_current)
         self.refresh_outputs()
+    
+    def add_thick_axes(self, length=2.5, width=4):
+        # X axis – red
+        x = gl.GLLinePlotItem(
+            pos=np.array([[0, 0, 0], [length, 0, 0]]),
+            color=(1, 0, 0, 1),
+            width=width,
+            antialias=True,
+            mode="lines",
+        )
+
+        # Y axis – green
+        y = gl.GLLinePlotItem(
+            pos=np.array([[0, 0, 0], [0, length, 0]]),
+            color=(0, 1, 0, 1),
+            width=width,
+            antialias=True,
+            mode="lines",
+        )
+
+        # Z axis – blue
+        z = gl.GLLinePlotItem(
+            pos=np.array([[0, 0, 0], [0, 0, length]]),
+            color=(0, 0, 1, 1),
+            width=width,
+            antialias=True,
+            mode="lines",
+        )
+
+        self.view.addItem(x)
+        self.view.addItem(y)
+        self.view.addItem(z)
+
 
     def load_meshdata(self, path):
         try:
